@@ -67,5 +67,12 @@ export {
 export type { PostcodeValidationOptions } from "./validation/postcode.js";
 
 // Structured Errors
-export { AddressError } from "./errors/address-error.js";
+export {
+  AddressError,
+  ConfigurationError,
+  ProviderError,
+  InvalidStateError,
+  InvalidLgaError,
+  InvalidPostcodeError
+} from "./errors/address-error.js";
 export type { AddressErrorOptions } from "./errors/address-error.js";

@@ -2,35 +2,43 @@ import type { AddressErrorCode } from "../types/error.js";
 
 export interface AddressErrorOptions {
   code: AddressErrorCode;
-  message: string;
+  message?: string;
   isRetryable?: boolean;
   provider?: string;
+  httpStatus?: number;
   retryAfter?: number;
   cause?: unknown;
   details?: Record<string, unknown>;
 }
 
 /**
- * Standard error class for all Nigerian address operations.
+ * Standard base error class for all Nigerian address operations.
  */
 export class AddressError extends Error {
   readonly code: AddressErrorCode;
   readonly isRetryable: boolean;
   readonly provider?: string;
+  readonly httpStatus?: number;
   readonly retryAfter?: number;
   readonly details?: Record<string, unknown>;
 
-  constructor(options: AddressErrorOptions) {
-    super(options.message, { cause: options.cause });
-    this.name = "AddressError";
-    this.code = options.code;
-    this.isRetryable = options.isRetryable ?? AddressError.isDefaultRetryable(options.code);
-    this.provider = options.provider;
-    this.retryAfter = options.retryAfter;
-    this.details = options.details;
+  constructor(messageOrOptions: string | AddressErrorOptions, options?: Partial<AddressErrorOptions>) {
+    const opts: AddressErrorOptions =
+      typeof messageOrOptions === "string"
+        ? { message: messageOrOptions, code: options?.code ?? "INVALID_INPUT", ...options }
+        : messageOrOptions;
+
+    super(opts.message ?? "Address operation error", { cause: opts.cause });
+    this.name = this.constructor.name;
+    this.code = opts.code;
+    this.isRetryable = opts.isRetryable ?? AddressError.isDefaultRetryable(opts.code);
+    this.provider = opts.provider;
+    this.httpStatus = opts.httpStatus;
+    this.retryAfter = opts.retryAfter;
+    this.details = opts.details;
 
     // Restore prototype chain
-    Object.setPrototypeOf(this, AddressError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 
   private static isDefaultRetryable(code: AddressErrorCode): boolean {
@@ -125,8 +133,61 @@ export class AddressError extends Error {
       message: this.message,
       isRetryable: this.isRetryable,
       provider: this.provider,
+      httpStatus: this.httpStatus,
       retryAfter: this.retryAfter,
       details: this.details
     };
+  }
+}
+
+export class ConfigurationError extends AddressError {
+  constructor(message: string, options?: Partial<AddressErrorOptions>) {
+    super(message, { code: "INVALID_INPUT", ...options });
+    this.name = "ConfigurationError";
+  }
+}
+
+export class ProviderError extends AddressError {
+  constructor(message: string, options?: Partial<AddressErrorOptions>) {
+    super(message, { code: "PROVIDER_ERROR", ...options });
+    this.name = "ProviderError";
+  }
+}
+
+export class InvalidStateError extends AddressError {
+  constructor(state: string, options?: Partial<AddressErrorOptions>) {
+    super(`Invalid Nigerian state: "${state}"`, {
+      code: "INVALID_INPUT",
+      details: { state },
+      ...options
+    });
+    this.name = "InvalidStateError";
+  }
+}
+
+export class InvalidLgaError extends AddressError {
+  constructor(lga: string, state?: string, options?: Partial<AddressErrorOptions>) {
+    super(
+      state
+        ? `Invalid Local Government Area (LGA) "${lga}" in state "${state}"`
+        : `Invalid Local Government Area (LGA): "${lga}"`,
+      {
+        code: "INVALID_INPUT",
+        details: { lga, state },
+        ...options
+      }
+    );
+    this.name = "InvalidLgaError";
+  }
+}
+
+export class InvalidPostcodeError extends AddressError {
+  constructor(postcode: string, options?: Partial<AddressErrorOptions>) {
+    super(`Invalid Nigerian postcode format: "${postcode}"`, {
+      code: "INVALID_POSTCODE",
+      details: { postcode },
+      ...options
+    });
+    this.name = "InvalidPostcodeError";
   }
 }
