@@ -58,7 +58,11 @@ Plans:
   2. React hooks manage resolution lifecycle (idle, loading, resolved, error) predictably.
   3. Confirmation UI presents resolved location details for user verification prior to form submission.
   4. Passes automated WCAG 2.2 AA accessibility audit with full keyboard navigability (Arrow keys, Enter, Escape).
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01: Scaffold @ng-address/react, AddressConfigContext, and headless hooks (useAddressResolution, usePostcodeLookup)
+- [ ] 03-02: Implement StateLgaSelect cascade, NigerianAddressInput combobox, dual confirmation cards/modals, and default CSS design tokens
 
 ### Phase 4: Developer CLI Tooling
 **Goal**: Build `@ng-address/cli` offering terminal commands for rapid lookup, address validation, and format conversion.
@@ -91,6 +95,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Monorepo Foundation & Core Primitives | 2/2 | Complete | 2026-10-02 |
 | 2. Authoritative NIPOST Provider Adapter | 2/2 | Complete | 2026-10-02 |
-| 3. React Component SDK | 0/TBD | Not started | - |
+| 3. React Component SDK | 0/2 | Ready to execute | - |
 | 4. Developer CLI Tooling | 0/TBD | Not started | - |
 | 5. Documentation, Reference Integrations & CI/CD | 0/TBD | Not started | - |
