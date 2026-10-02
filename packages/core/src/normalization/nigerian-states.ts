@@ -331,9 +331,17 @@ export function findNigerianState(input: string): NigerianStateData | undefined 
 /**
  * Find matching LGA within a specific state, or across all states if state not provided.
  */
-export function findMatchingLga(lgaName: string, stateData?: NigerianStateData): string | undefined {
+export function findMatchingLga(
+  lgaName: string,
+  stateOrStateData?: string | NigerianStateData
+): string | undefined {
   if (!lgaName) return undefined;
   const target = lgaName.toLowerCase().trim().replace(/[-_/]/g, " ");
+
+  const stateData =
+    typeof stateOrStateData === "string"
+      ? findNigerianState(stateOrStateData)
+      : stateOrStateData;
 
   if (stateData) {
     for (const lga of stateData.lgas) {
