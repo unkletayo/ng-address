@@ -28,7 +28,11 @@ NG Address delivers standard, open-source developer infrastructure for Nigerian 
   3. `isValidPostcodeFormat()` accurately validates digital postcode syntax offline.
   4. Address normalization standardizes casing, whitespace, and 36 states + FCT / 774 LGA names.
   5. `AddressProvider` contract is published and ready for adapter implementations.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01: Bootstrap monorepo workspace and scaffold @ng-address/core package with tsup and Vitest
+- [ ] 01-02: Implement canonical domain types, Zod schemas, provenance model, normalization, postcode validation, and error hierarchy
 
 ### Phase 2: Authoritative NIPOST Provider Adapter
 **Goal**: Implement `@ng-address/nipost` adapter connecting to NIPOST NDAPS services with server-side credential isolation, rate limit resilience, and error mapping.
@@ -81,7 +85,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Foundation & Core Primitives | 0/TBD | Not started | - |
+| 1. Monorepo Foundation & Core Primitives | 0/2 | Ready to execute | - |
 | 2. Authoritative NIPOST Provider Adapter | 0/TBD | Not started | - |
 | 3. React Component SDK | 0/TBD | Not started | - |
 | 4. Developer CLI Tooling | 0/TBD | Not started | - |
