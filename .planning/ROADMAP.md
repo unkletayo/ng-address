@@ -43,7 +43,11 @@ Plans:
   2. Credentials remain strictly server-side with zero exposure in client bundles.
   3. Transient network failures and HTTP 5xx responses trigger exponential backoff retries with jitter.
   4. Upstream HTTP errors (401, 403, 429, 500) map cleanly to typed `AddressError` instances.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 02-01: Scaffold @ng-address/nipost package, configuration schemas, resilient HTTP client with backoff and client-side isolation guard
+- [ ] 02-02: Implement NipostProvider address methods, response normalization into NigerianAddress with 'nipost' provenance, and test suite
 
 ### Phase 3: React Component SDK
 **Goal**: Build `@ng-address/react` with accessible address inputs, postcode lookup hooks, loading/error states, and a location confirmation dialog.
