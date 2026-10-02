@@ -2,54 +2,81 @@
 
 **Phase:** 2  
 **Target Package:** `packages/nipost` (`@ng-address/nipost`)  
+**Official API Docs:** [docs.postcode.gov.ng](https://docs.postcode.gov.ng/) (OpenAPI 3.1.0 at `api.postcode.gov.ng`)  
 **Dependencies:** `@ng-address/core`  
 **Date:** 2026-10-02
 
 ---
 
-## 1. Domain & Architecture Overview
+## 1. Official NIPOST Postcode API Specifications
 
-The `@ng-address/nipost` package provides the authoritative adapter for resolving Nigerian addresses and postal codes through NIPOST (Nigerian Postal Service) NDAPS / API endpoints.
+NIPOST provides official REST endpoints via `https://api.postcode.gov.ng`:
 
-### Key Objectives
-1. **Contract Implementation**: Implement `AddressProvider` from `@ng-address/core`.
-2. **Server-Side Security**: Enforce server-only execution. Prevent API keys from leaking into browser bundles via runtime environment checks (`typeof window !== 'undefined'` guard).
-3. **Resilience & Rate Limiting**: Handle network turbulence, rate limits (HTTP 429), and upstream outages (HTTP 5xx) with jittered exponential backoff and request throttling.
-4. **Error Mapping**: Translate upstream HTTP errors and empty responses into structured `AddressError` hierarchy.
-5. **Data Transformation & Provenance**: Parse and normalize raw NIPOST payloads into canonical `NigerianAddress` instances with `FieldSource: 'nipost'`.
+### 1.1 Postcode Format (NDAPS 5-Segment)
+- 12 characters across 5 segments: `AA-99-H77-BB-55`
+  - `AA`: 2 alpha (State code, e.g. `EK`, `LA`, `FC`)
+  - `99`: 2 numeric (LGA code, zero-filled, 01–99)
+  - `H77`: 3 alphanumeric (District code)
+  - `BB`: 2 alpha (Area code)
+  - `55`: 2 numeric (Building unit code, zero-filled, 01–99)
+- Three valid representation styles:
+  - Formatted: `EK-01-A03-FK-01`
+  - Display: `EK 01 A03 FK 01`
+  - Compact: `EK01A03FK01`
+
+### 1.2 Authentication & Key Types
+- Authentication Header: `X-API-Key: <key>`
+- Key Prefixes:
+  - `nipost_test_...` / `nipost_live_...`: Secret keys (server-side only, full access level)
+  - `nipost_pk_test_...` / `nipost_pk_live_...`: Publishable keys (client-side widget, level ≤ 3)
+- Rate Limit Response Headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`
+
+### 1.3 Endpoints
+- `GET /healthz`: Health check (no auth required)
+- `GET /v1/lookup?code={code}&level={1|2|3|4|5}`:
+  - Level 1: Validity check (`{ valid: boolean, postcode: string }`) — Free/Public
+  - Level 2+: Returns `administrative_address` (`state_name`, `lga_name`, `locality_name`, `zone`) and `recent_house_address`
+  - Level 3+: Returns `building_use_status`
+- `GET /v1/search/reverse?lat={lat}&lng={lng}&max_distance_m={radius}`: Reverse geocoding (default 25m, max 250m) returning unit, area, district, state, and confidence.
+- `GET /v1/search/nearby?lat={lat}&lng={lng}&radius={300}`: Radius search around coordinates.
+- `GET /v1/search/autocomplete?q={q}`: Segment-aware suggestions.
+- `POST /v1/assembly/assemble`: Assemble segments into `{ postcode, display, compact }`.
+- `GET /v1/assembly/disassemble?code={code}`: Break postcode into 5 structured segments.
+
+### 1.4 Response Envelopes
+- Success: `{ "data": { ... } }`
+- Error: `{ "error": { "code": "insufficient_credits" | "rate_limited" | ..., "message": "..." } }`
 
 ---
 
-## 2. Technical Decisions & Patterns
+## 2. Technical Architecture & Adapter Design
 
-### 2.1 Package Setup
-- **Name:** `@ng-address/nipost`
-- **Dependencies:** `@ng-address/core` (workspace protocol `workspace:*`), `zod`
-- **Bundler:** `tsup` configured for dual ESM (`dist/index.js`) and CJS (`dist/index.cjs`) output with type declarations (`dist/index.d.ts`).
-- **Testing:** `vitest` with mock HTTP handlers (`msw` or native fetch mocking).
-
-### 2.2 Client Safety Guard
+### 2.1 Configuration Schema
 ```typescript
-if (typeof window !== "undefined" && !config.allowClientUsage) {
-  throw new ConfigurationError("NipostProvider cannot be initialized in client-side bundles.");
+export interface NipostConfig {
+  apiKey?: string;
+  baseUrl?: string; // Default: 'https://api.postcode.gov.ng'
+  level?: 1 | 2 | 3 | 4 | 5; // Default: 2
+  timeoutMs?: number; // Default: 5000
+  maxRetries?: number; // Default: 3
+  retryDelayMs?: number; // Default: 500
+  allowClientUsage?: boolean; // Default: false
 }
 ```
 
-### 2.3 Retry and Rate Limiting
-- Configurable retry attempts (default: 3).
-- Jittered exponential backoff: $T = \min(\text{maxDelay}, \text{baseDelay} \times 2^{\text{attempt}} + \text{jitter})$.
-- Concurrency limiter / token bucket for outbound requests.
+### 2.2 Client-Side Isolation
+Enforce secret key protection by checking `typeof window !== 'undefined'` when initialized with a secret key (`nipost_live_...` or `nipost_test_...`).
 
-### 2.4 Error Translation Map
-- `401 / 403`: `ProviderError` (code: `PROVIDER_AUTH_ERROR`)
-- `404`: Returns empty result or `InvalidPostcodeError` when an explicit postcode lookup fails to locate an entry.
-- `429`: `ProviderError` (code: `PROVIDER_RATE_LIMITED`) with `retryAfterMs` metadata if `Retry-After` header is present.
-- `500 / 502 / 503 / 504`: `ProviderError` (code: `PROVIDER_UNAVAILABLE`)
-- Network timeouts: `ProviderError` (code: `PROVIDER_TIMEOUT`)
+### 2.3 Status & Error Mapping
+- `401`: `ProviderError` (`PROVIDER_AUTH_ERROR`)
+- `402`: `ProviderError` (`INSUFFICIENT_CREDITS`)
+- `403`: `ProviderError` (`PROVIDER_AUTH_ERROR` / Scope insufficient)
+- `429`: `ProviderError` (`PROVIDER_RATE_LIMITED`)
+- `5xx`: Exponential backoff with jitter, then `ProviderError` (`PROVIDER_UNAVAILABLE`)
 
 ---
 
 ## 3. Plan Decomposition
 
-- **Plan 02-01: Package Scaffolding & HTTP Client**: Monorepo package scaffold, configuration types, HTTP transport layer with retry logic, rate limiting, and client-side guards.
-- **Plan 02-02: NipostProvider Implementation & Test Suite**: Complete `AddressProvider` methods (`lookupPostcode`, `reverseGeocode`, `search`, `healthCheck`), payload normalization into `NigerianAddress`, and integration unit tests.
+- **Plan 02-01**: Monorepo package scaffold, NDAPS format parsing/disassembly helpers, configuration schemas, resilient HTTP transport with `X-API-Key` headers, retry backoff, and server-side safety guards.
+- **Plan 02-02**: `NipostProvider` implementation matching `docs.postcode.gov.ng` endpoints (`lookup`, `reverse`, `search`, `healthz`), normalization into `NigerianAddress` with `'nipost'` provenance, and unit test suite using real official test postcodes (`LA-11-W06-TC-10`, `FC-03-B06-AG-12`, `EN-05-V19-CD-22`).
