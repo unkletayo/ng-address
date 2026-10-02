@@ -1,3 +1,7 @@
+---
+last_mapped_commit: 8ee1b9954b829144762fbb96036eb9d62ea0347b
+last_mapped_at: 2026-10-02
+---
 # Architecture
 
 **Analysis Date:** 2026-10-02
@@ -40,16 +44,19 @@
 ```
 
 ### 1. Core Layer (`packages/core`)
+
 - **Purpose:** Foundational data types, validation schemas, error hierarchy, and provider interfaces.
 - **Contains:** `NigerianAddress`, `AddressValidation`, `AddressErrorCode`, `AddressProvider` interface.
 - **Depends on:** Validation library (Zod / Valibot) only.
 
 ### 2. Provider Layer (`packages/provider-nipost`)
+
 - **Purpose:** Implementation of `AddressProvider` against NIPOST NDAPS endpoints.
 - **Contains:** HTTP client, auth token handling, payload serialization/deserialization, error normalization.
 - **Depends on:** `@ng-address/core`.
 
 ### 3. Client & Tooling Layer (`packages/react`, `packages/cli`)
+
 - **Purpose:** User-facing components and developer tools.
 - **Contains:** `<NigerianAddressInput />`, postcode input hooks, search UI, CLI command handlers (`lookup`, `validate`, `search`).
 - **Depends on:** `@ng-address/core` and provider adapters.

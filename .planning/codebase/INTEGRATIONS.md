@@ -1,3 +1,7 @@
+---
+last_mapped_commit: 8ee1b9954b829144762fbb96036eb9d62ea0347b
+last_mapped_at: 2026-10-02
+---
 # External Integrations
 
 **Analysis Date:** 2026-10-02
@@ -5,6 +9,7 @@
 ## Provider Integrations
 
 ### 1. NIPOST NDAPS (National Digital Alphanumeric Postcode System)
+
 - **Role:** Authoritative national postcode provider for Nigeria
 - **Authentication:** Server-side API Key / Bearer Token / OAuth credentials
 - **Adapter Location:** `packages/provider-nipost/` (`@ng-address/nipost`)
@@ -20,6 +25,7 @@
   - Transparent provenance tracking (`source: "nipost"`)
 
 ### 2. Extensible Provider Architecture
+
 - **Interface:** `AddressProvider` contract defined in `@ng-address/core` (`packages/core/src/provider.ts`)
 - **Capabilities Matrix:**
   - `search: boolean`

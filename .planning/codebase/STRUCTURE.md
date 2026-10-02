@@ -1,3 +1,7 @@
+---
+last_mapped_commit: 8ee1b9954b829144762fbb96036eb9d62ea0347b
+last_mapped_at: 2026-10-02
+---
 # Directory Structure
 
 **Analysis Date:** 2026-10-02
