@@ -11,7 +11,7 @@ NG Address delivers standard, open-source developer infrastructure for Nigerian 
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Monorepo Foundation & Core Primitives** - Bootstrap workspace and build `@ng-address/core` with schemas, provenance, validation, and error hierarchy.
-- [ ] **Phase 2: Authoritative NIPOST Provider Adapter** - Build `@ng-address/nipost` adapter with secure server auth, rate limiting, and exponential retry.
+- [x] **Phase 2: Authoritative NIPOST Provider Adapter** - Build `@ng-address/nipost` adapter with secure server auth, rate limiting, and exponential retry.
 - [ ] **Phase 3: React Component SDK** - Build accessible (`WCAG 2.2 AA`), keyboard-navigable `<NigerianAddressInput />` and confirmation flow in `@ng-address/react`.
 - [ ] **Phase 4: Developer CLI Tooling** - Build `@ng-address/cli` with terminal commands for lookup, validation, search, and formatting.
 - [ ] **Phase 5: Documentation, Reference Integrations & CI/CD** - Deliver Next.js & Express reference apps, guides, and automated testing pipelines.
@@ -46,8 +46,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Scaffold @ng-address/nipost package, configuration schemas, resilient HTTP client with backoff and client-side isolation guard
-- [ ] 02-02: Implement NipostProvider address methods, response normalization into NigerianAddress with 'nipost' provenance, and test suite
+- [x] 02-01: Scaffold @ng-address/nipost package, configuration schemas, resilient HTTP client with backoff and client-side isolation guard
+- [x] 02-02: Implement NipostProvider address methods, response normalization into NigerianAddress with 'nipost' provenance, and test suite
 
 ### Phase 3: React Component SDK
 **Goal**: Build `@ng-address/react` with accessible address inputs, postcode lookup hooks, loading/error states, and a location confirmation dialog.
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Monorepo Foundation & Core Primitives | 2/2 | Complete | 2026-10-02 |
-| 2. Authoritative NIPOST Provider Adapter | 0/TBD | Not started | - |
+| 2. Authoritative NIPOST Provider Adapter | 2/2 | Complete | 2026-10-02 |
 | 3. React Component SDK | 0/TBD | Not started | - |
 | 4. Developer CLI Tooling | 0/TBD | Not started | - |
 | 5. Documentation, Reference Integrations & CI/CD | 0/TBD | Not started | - |
