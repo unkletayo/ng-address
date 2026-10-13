@@ -34,3 +34,8 @@ skills/*
 .agent/*
 .agents/*
 
+
+# Build artifacts and stray lockfiles (project uses pnpm)
+.next
+*.tsbuildinfo
+bun.lock
