@@ -1,0 +1,456 @@
+/**
+ * @ng-address/react Default Design Tokens & Stylesheet
+ * Compatible with Vanilla CSS, CSS Modules, Tailwind CSS, and Next.js.
+ */
+
+:root {
+  --nga-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --nga-bg: #ffffff;
+  --nga-surface: #f8fafc;
+  --nga-surface-hover: #f1f5f9;
+  --nga-border: #cbd5e1;
+  --nga-border-focus: #0f172a;
+  --nga-text: #0f172a;
+  --nga-text-muted: #64748b;
+  --nga-primary: #059669;
+  --nga-primary-hover: #047857;
+  --nga-primary-contrast: #ffffff;
+  --nga-ring: #059669;
+  --nga-error: #e11d48;
+  --nga-error-bg: #fff1f2;
+  --nga-radius: 8px;
+  --nga-radius-sm: 6px;
+  --nga-radius-lg: 12px;
+  --nga-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --nga-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nga-bg: #0f172a;
+    --nga-surface: #1e293b;
+    --nga-surface-hover: #334155;
+    --nga-border: #334155;
+    --nga-border-focus: #94a3b8;
+    --nga-text: #f8fafc;
+    --nga-text-muted: #94a3b8;
+    --nga-primary: #10b981;
+    --nga-primary-hover: #059669;
+    --nga-primary-contrast: #0f172a;
+    --nga-ring: #10b981;
+    --nga-error: #fb7185;
+    --nga-error-bg: #881337;
+  }
+}
+
+/* Base Container */
+.nga-container,
+.nga-cascade,
+.nga-card {
+  font-family: var(--nga-font);
+  color: var(--nga-text);
+  box-sizing: border-box;
+}
+
+.nga-container *,
+.nga-cascade *,
+.nga-card * {
+  box-sizing: border-box;
+}
+
+.nga-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.nga-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--nga-text);
+}
+
+.nga-required {
+  color: var(--nga-error);
+}
+
+.nga-mode-toggle {
+  background: transparent;
+  border: none;
+  color: var(--nga-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 6px;
+  border-radius: var(--nga-radius-sm);
+  transition: opacity 150ms ease;
+}
+
+.nga-mode-toggle:hover {
+  opacity: 0.8;
+}
+
+.nga-mode-toggle:focus-visible {
+  outline: 2px solid var(--nga-ring);
+  outline-offset: 2px;
+}
+
+/* Inputs & Selects */
+.nga-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nga-input,
+.nga-select {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--nga-text);
+  background-color: var(--nga-bg);
+  border: 1.5px solid var(--nga-border);
+  border-radius: var(--nga-radius);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.nga-input:focus,
+.nga-select:focus,
+.nga-input:focus-visible,
+.nga-select:focus-visible {
+  outline: none;
+  border-color: var(--nga-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nga-ring) 25%, transparent);
+}
+
+.nga-input[disabled],
+.nga-select[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--nga-surface);
+}
+
+.nga-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  line-height: 1.4;
+}
+
+.nga-postcode-badge {
+  position: absolute;
+  right: 10px;
+  background-color: color-mix(in srgb, var(--nga-primary) 15%, transparent);
+  color: var(--nga-primary);
+  border: 1px solid var(--nga-primary);
+}
+
+.nga-badge-verified {
+  background-color: color-mix(in srgb, var(--nga-primary) 20%, transparent);
+  color: var(--nga-primary);
+}
+
+/* Spinner */
+.nga-spinner {
+  position: absolute;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--nga-border);
+  border-top-color: var(--nga-primary);
+  border-radius: 50%;
+  animation: nga-spin 0.6s linear infinite;
+}
+
+@keyframes nga-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Listbox Suggestions */
+.nga-combobox-wrapper {
+  position: relative;
+}
+
+.nga-listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--nga-bg);
+  border: 1px solid var(--nga-border);
+  border-radius: var(--nga-radius);
+  box-shadow: var(--nga-shadow);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 50;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.nga-option {
+  padding: 8px 12px;
+  border-radius: var(--nga-radius-sm);
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.nga-option:hover,
+.nga-option-focused,
+.nga-option[aria-selected='true'] {
+  background-color: var(--nga-surface-hover);
+}
+
+.nga-option-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--nga-text);
+}
+
+.nga-option-subtitle {
+  font-size: 0.75rem;
+  color: var(--nga-text-muted);
+  margin-top: 2px;
+}
+
+/* Cascading Selects */
+.nga-cascade {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nga-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Confirmation Card */
+.nga-card {
+  background-color: var(--nga-surface);
+  border: 1.5px solid var(--nga-border);
+  border-radius: var(--nga-radius-lg);
+  padding: 16px;
+  box-shadow: var(--nga-shadow);
+}
+
+.nga-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--nga-border);
+  padding-bottom: 10px;
+}
+
+.nga-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.nga-card-description {
+  margin: 4px 0 0 0;
+  font-size: 0.8125rem;
+  color: var(--nga-text-muted);
+}
+
+.nga-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nga-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .nga-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nga-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nga-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nga-text-muted);
+}
+
+.nga-meta-value {
+  font-size: 0.875rem;
+  color: var(--nga-text);
+}
+
+.nga-font-bold {
+  font-weight: 600;
+}
+
+.nga-code-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+}
+
+.nga-coords {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.nga-accuracy {
+  color: var(--nga-text-muted);
+  font-size: 0.75rem;
+}
+
+.nga-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--nga-border);
+}
+
+.nga-button {
+  min-height: 38px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: var(--nga-radius);
+  cursor: pointer;
+  transition: transform 100ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms ease;
+}
+
+.nga-button:active {
+  transform: scale(0.96);
+}
+
+.nga-button:focus-visible {
+  outline: 2px solid var(--nga-ring);
+  outline-offset: 2px;
+}
+
+.nga-button-primary {
+  background-color: var(--nga-primary);
+  color: var(--nga-primary-contrast);
+  border: none;
+}
+
+.nga-button-primary:hover {
+  background-color: var(--nga-primary-hover);
+}
+
+.nga-button-secondary {
+  background-color: transparent;
+  color: var(--nga-text);
+  border: 1.5px solid var(--nga-border);
+}
+
+.nga-button-secondary:hover {
+  background-color: var(--nga-surface-hover);
+}
+
+/* Modal Dialog */
+.nga-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.nga-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: var(--nga-bg);
+  border-radius: var(--nga-radius-lg);
+  box-shadow: var(--nga-shadow-lg);
+  overflow: hidden;
+  animation: nga-modal-enter 180ms ease-out;
+}
+
+.nga-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--nga-radius-sm);
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--nga-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.nga-modal-close:hover {
+  color: var(--nga-text);
+  background-color: var(--nga-surface-hover);
+}
+
+@keyframes nga-modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.nga-error-text {
+  margin: 4px 0 0 0;
+  font-size: 0.8125rem;
+  color: var(--nga-error);
+}
+
+.nga-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .nga-spinner,
+  .nga-modal-dialog,
+  .nga-button {
+    animation: none !important;
+    transition: none !important;
+  }
+}
