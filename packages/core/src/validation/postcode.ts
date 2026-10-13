@@ -4,7 +4,8 @@
  * 2. NDAPS Digital alphanumeric postcode: 6 to 12 alphanumeric characters, e.g. "LA100001", "AB1029", "FC2001AB"
  */
 const TRADITIONAL_POSTCODE_REGEX = /^[0-9]{6}$/;
-const DIGITAL_POSTCODE_REGEX = /^[A-Z0-9]{6,12}$/i;
+const DIGITAL_POSTCODE_REGEX = /^[A-Z]{2}[0-9A-Z]{4,10}$/i;
+const NDAPS_SEGMENTS_REGEX = /^[A-Z]{2}[-\s]?[0-9]{2}[-\s]?[A-Z0-9]{3}[-\s]?[A-Z0-9]{2}[-\s]?[0-9]{2}$/i;
 
 /**
  * Format validation options.
@@ -32,21 +33,29 @@ export function isValidPostcodeFormat(
     return false;
   }
 
-  const cleaned = postcode.trim().replace(/\s+/g, "").toUpperCase();
+  const raw = postcode.trim();
+  if (raw.length === 0) {
+    return false;
+  }
+
+  const cleaned = raw.replace(/[-\s]+/g, "").toUpperCase();
   if (cleaned.length === 0) {
     return false;
   }
 
+  const isTraditional = TRADITIONAL_POSTCODE_REGEX.test(cleaned);
+  const isDigital = DIGITAL_POSTCODE_REGEX.test(cleaned) || NDAPS_SEGMENTS_REGEX.test(raw);
+
   if (options.traditionalOnly) {
-    return TRADITIONAL_POSTCODE_REGEX.test(cleaned);
+    return isTraditional;
   }
 
   if (options.digitalOnly) {
-    return DIGITAL_POSTCODE_REGEX.test(cleaned);
+    return isDigital;
   }
 
   // Accept either valid traditional numeric or digital alphanumeric
-  return TRADITIONAL_POSTCODE_REGEX.test(cleaned) || DIGITAL_POSTCODE_REGEX.test(cleaned);
+  return isTraditional || isDigital;
 }
 
 /**
