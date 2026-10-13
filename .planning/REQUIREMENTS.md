@@ -81,31 +81,31 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
-| CORE-04 | Phase 1 | Pending |
-| CORE-05 | Phase 1 | Pending |
-| CORE-06 | Phase 1 | Pending |
-| NIPOST-01 | Phase 2 | Pending |
-| NIPOST-02 | Phase 2 | Pending |
-| NIPOST-03 | Phase 2 | Pending |
-| NIPOST-04 | Phase 2 | Pending |
-| NIPOST-05 | Phase 2 | Pending |
-| REACT-01 | Phase 3 | Pending |
-| REACT-02 | Phase 3 | Pending |
-| REACT-03 | Phase 3 | Pending |
-| REACT-04 | Phase 3 | Pending |
-| REACT-05 | Phase 3 | Pending |
-| CLI-01 | Phase 4 | Pending |
-| CLI-02 | Phase 4 | Pending |
-| CLI-03 | Phase 4 | Pending |
-| CLI-04 | Phase 4 | Pending |
-| DOCS-01 | Phase 5 | Pending |
-| DOCS-02 | Phase 5 | Pending |
-| DOCS-03 | Phase 5 | Pending |
-| DOCS-04 | Phase 5 | Pending |
-| DOCS-05 | Phase 5 | Pending |
+| CORE-01 | Phase 1 | Complete |
+| CORE-02 | Phase 1 | Complete |
+| CORE-03 | Phase 1 | Complete |
+| CORE-04 | Phase 1 | Complete |
+| CORE-05 | Phase 1 | Complete |
+| CORE-06 | Phase 1 | Complete |
+| NIPOST-01 | Phase 2 | Complete |
+| NIPOST-02 | Phase 2 | Complete |
+| NIPOST-03 | Phase 2 | Complete |
+| NIPOST-04 | Phase 2 | Complete |
+| NIPOST-05 | Phase 2 | Complete |
+| REACT-01 | Phase 3 | Complete |
+| REACT-02 | Phase 3 | Complete |
+| REACT-03 | Phase 3 | Complete |
+| REACT-04 | Phase 3 | Complete |
+| REACT-05 | Phase 3 | Complete |
+| CLI-01 | Phase 4 | Complete |
+| CLI-02 | Phase 4 | Complete |
+| CLI-03 | Phase 4 | Complete |
+| CLI-04 | Phase 4 | Complete |
+| DOCS-01 | Phase 5 | Complete |
+| DOCS-02 | Phase 5 | Complete |
+| DOCS-03 | Phase 5 | Complete |
+| DOCS-04 | Phase 5 | Complete |
+| DOCS-05 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total

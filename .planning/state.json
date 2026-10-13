@@ -1,0 +1,38 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Monorepo Foundation & Core Primitives",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Authoritative NIPOST Provider Adapter",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "React Component SDK",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Developer CLI Tooling",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "Documentation, Reference Integrations & CI/CD",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd-progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 03 of 5 · 40% · executing"
+  },
+  "updated_at": "2026-10-02T10:58:55.888Z"
+}

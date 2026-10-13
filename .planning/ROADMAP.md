@@ -12,9 +12,9 @@ NG Address delivers standard, open-source developer infrastructure for Nigerian 
 
 - [x] **Phase 1: Monorepo Foundation & Core Primitives** - Bootstrap workspace and build `@ng-address/core` with schemas, provenance, validation, and error hierarchy.
 - [x] **Phase 2: Authoritative NIPOST Provider Adapter** - Build `@ng-address/nipost` adapter with secure server auth, rate limiting, and exponential retry.
-- [ ] **Phase 3: React Component SDK** - Build accessible (`WCAG 2.2 AA`), keyboard-navigable `<NigerianAddressInput />` and confirmation flow in `@ng-address/react`.
-- [ ] **Phase 4: Developer CLI Tooling** - Build `@ng-address/cli` with terminal commands for lookup, validation, search, and formatting.
-- [ ] **Phase 5: Documentation, Reference Integrations & CI/CD** - Deliver Next.js & Express reference apps, guides, and automated testing pipelines.
+- [x] **Phase 3: React Component SDK** - Build accessible (`WCAG 2.2 AA`), keyboard-navigable `<NigerianAddressInput />` and confirmation flow in `@ng-address/react`.
+- [x] **Phase 4: Developer CLI Tooling** - Build `@ng-address/cli` with terminal commands for lookup, validation, search, and formatting.
+- [x] **Phase 5: Documentation, Reference Integrations & CI/CD** - Deliver Next.js & Express reference apps, guides, and automated testing pipelines.
 
 ## Phase Details
 
@@ -61,8 +61,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Scaffold @ng-address/react, AddressConfigContext, and headless hooks (useAddressResolution, usePostcodeLookup)
-- [ ] 03-02: Implement StateLgaSelect cascade, NigerianAddressInput combobox, dual confirmation cards/modals, and default CSS design tokens
+- [x] 03-01: Scaffold @ng-address/react, AddressConfigContext, and headless hooks (useAddressResolution, usePostcodeLookup)
+- [x] 03-02: Implement StateLgaSelect cascade, NigerianAddressInput combobox, dual confirmation cards/modals, and default CSS design tokens
 
 ### Phase 4: Developer CLI Tooling
 **Goal**: Build `@ng-address/cli` offering terminal commands for rapid lookup, address validation, and format conversion.
@@ -73,7 +73,11 @@ Plans:
   2. `ng-address validate <address>` performs offline syntax and normalization checks.
   3. `ng-address normalize <input>` outputs cleaned, structured address representations.
   4. Supports JSON and tabular output formatting with `NIPOST_API_KEY` environment variable integration.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01: Scaffold @ng-address/cli, CAC router, environment resolution, exit handlers, and formatting engine
+- [ ] 04-02: Implement CLI subcommands (lookup, validate, normalize, list-states), interactive wizard, and test suite
 
 ### Phase 5: Documentation, Reference Integrations & CI/CD
 **Goal**: Produce production-ready Next.js App Router and Express reference applications, comprehensive setup/security documentation, and GitHub Actions CI pipelines.
@@ -95,6 +99,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Monorepo Foundation & Core Primitives | 2/2 | Complete | 2026-10-02 |
 | 2. Authoritative NIPOST Provider Adapter | 2/2 | Complete | 2026-10-02 |
-| 3. React Component SDK | 0/2 | Ready to execute | - |
-| 4. Developer CLI Tooling | 0/TBD | Not started | - |
-| 5. Documentation, Reference Integrations & CI/CD | 0/TBD | Not started | - |
+| 3. React Component SDK | 2/2 | Complete | 2026-10-02 |
+| 4. Developer CLI Tooling | 2/2 | Complete | 2026-10-02 |
+| 5. Documentation, Reference Integrations & CI/CD | 2/2 | Complete | 2026-10-02 |
