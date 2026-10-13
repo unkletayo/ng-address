@@ -21,7 +21,7 @@ describe('NipostConfig & Client-Side Guard', () => {
     });
 
     expect(config.baseUrl).toBe('https://api.postcode.gov.ng');
-    expect(config.level).toBe(2);
+    expect(config.level).toBe(1);
     expect(config.timeoutMs).toBe(5000);
     expect(config.maxRetries).toBe(3);
     expect(config.retryDelayMs).toBe(500);

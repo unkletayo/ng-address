@@ -23,6 +23,9 @@ export interface NipostLookupRecentHouseAddress {
 export interface NipostLookupData {
   postcode: string;
   valid: boolean;
+  /** Observed live (not in the OpenAPI spec): e.g. "not_found" when the code is not a known unit. */
+  status?: string;
+  verified?: boolean;
   administrative_address?: NipostLookupAdministrativeAddress;
   recent_house_address?: NipostLookupRecentHouseAddress;
   building_use_status?: string;
@@ -70,18 +73,16 @@ export function transformLookupResponse(
   // Canonical state resolution
   let stateName = admin?.state_name;
   let stateCode: string | undefined;
-  if (stateName) {
-    const matchedState = findNigerianState(stateName);
-    if (matchedState) {
-      stateName = matchedState.name;
-      stateCode = matchedState.code;
-    }
+  const matchedState = stateName ? findNigerianState(stateName) : undefined;
+  if (matchedState) {
+    stateName = matchedState.name;
+    stateCode = matchedState.code;
   }
 
   // Canonical LGA resolution
   let lgaName = admin?.lga_name;
-  if (lgaName && stateName) {
-    const matchedLga = findMatchingLga(lgaName, stateName);
+  if (lgaName) {
+    const matchedLga = findMatchingLga(lgaName, matchedState);
     if (matchedLga) {
       lgaName = matchedLga;
     }
@@ -167,18 +168,16 @@ export function transformReverseResponse(data: NipostReverseData): NigerianAddre
   const unit = data.unit;
   let stateName = unit.state_name || data.state;
   let stateCode: string | undefined;
+  const matchedState = stateName ? findNigerianState(stateName) : undefined;
 
-  if (stateName) {
-    const matchedState = findNigerianState(stateName);
-    if (matchedState) {
-      stateName = matchedState.name;
-      stateCode = matchedState.code;
-    }
+  if (matchedState) {
+    stateName = matchedState.name;
+    stateCode = matchedState.code;
   }
 
   let lgaName = unit.lga_name;
-  if (lgaName && stateName) {
-    const matchedLga = findMatchingLga(lgaName, stateName);
+  if (lgaName) {
+    const matchedLga = findMatchingLga(lgaName, matchedState);
     if (matchedLga) {
       lgaName = matchedLga;
     }

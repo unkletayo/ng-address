@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const NipostConfigSchema = z.object({
   apiKey: z.string().optional(),
   baseUrl: z.string().url().default('https://api.postcode.gov.ng'),
-  level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).default(2),
+  level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).default(1),
   timeoutMs: z.number().positive().default(5000),
   maxRetries: z.number().int().nonnegative().default(3),
   retryDelayMs: z.number().positive().default(500),
