@@ -32,6 +32,22 @@ export interface AutocompleteResult {
   suggestions: AutocompleteSuggestion[];
 }
 
+/** A code with an optional full name. Districts and areas are code-only. */
+export interface NamedCode {
+  code: string;
+  name?: string;
+}
+
+export interface ReverseGeocodeOptions {
+  /** Search radius in metres. Server default is 25, hard ceiling is 250. */
+  maxDistanceM?: number;
+}
+
+export interface NearbyOptions {
+  /** Search radius in metres. Server default is 300. */
+  radius?: number;
+}
+
 export class NipostProvider implements AddressProvider {
   readonly name = 'nipost';
   readonly capabilities: ProviderCapabilities = {
@@ -50,7 +66,7 @@ export class NipostProvider implements AddressProvider {
   }
 
   /**
-   * Health check against NIPOST gateway endpoint (GET /healthz).
+   * Health check against NIPOST gateway endpoint (GET /healthz). The only unauthenticated endpoint.
    */
   async healthCheck(): Promise<{ ok: boolean; latencyMs: number }> {
     const start = Date.now();
@@ -69,19 +85,24 @@ export class NipostProvider implements AddressProvider {
   }
 
   /**
-   * Resolves an NDAPS or legacy postal code to a canonical NigerianAddress.
+   * Resolves an NDAPS postcode to a canonical NigerianAddress (GET /v1/lookup).
    */
   async resolvePostcode(postcode: string): Promise<AddressResolution> {
     if (!postcode || typeof postcode !== 'string') {
       throw AddressError.invalidInput('Postcode cannot be empty');
     }
 
-    const cleanCode = postcode.replace(/[\s-]/g, '').toUpperCase();
-    const level = this.config.level ?? 2;
+    const segments = parseNdapsPostcode(postcode);
+    if (!segments) {
+      throw AddressError.invalidPostcode(postcode);
+    }
 
-    const response = await this.http.get<{ data: NipostLookupData }>(
-      `/v1/lookup?code=${encodeURIComponent(cleanCode)}&level=${level}`
-    );
+    const response = await this.http.get<{ data: NipostLookupData }>('/v1/lookup', {
+      params: {
+        code: formatNdapsPostcode(segments, 'formatted'),
+        level: this.config.level
+      }
+    });
 
     const lookupData = response?.data;
     if (!lookupData || !lookupData.valid) {
@@ -98,17 +119,24 @@ export class NipostProvider implements AddressProvider {
   }
 
   /**
-   * Reverse geocodes coordinates to the nearest active NIPOST unit.
+   * Reverse geocodes coordinates to the nearest active NIPOST unit (GET /v1/search/reverse).
    */
-  async reverseGeocode(coordinates: Coordinates): Promise<AddressResolution> {
+  async reverseGeocode(
+    coordinates: Coordinates,
+    options?: ReverseGeocodeOptions
+  ): Promise<AddressResolution> {
     const { latitude, longitude } = coordinates;
     if (typeof latitude !== 'number' || typeof longitude !== 'number') {
       throw AddressError.invalidInput('Valid latitude and longitude are required for reverse geocoding');
     }
 
-    const response = await this.http.get<{ data: NipostReverseData }>(
-      `/v1/search/reverse?lat=${latitude}&lng=${longitude}&max_distance_m=250`
-    );
+    const response = await this.http.get<{ data: NipostReverseData }>('/v1/search/reverse', {
+      params: {
+        lat: latitude,
+        lng: longitude,
+        max_distance_m: options?.maxDistanceM
+      }
+    });
 
     const reverseData = response?.data;
     if (!reverseData || !reverseData.found) {
@@ -128,90 +156,121 @@ export class NipostProvider implements AddressProvider {
   }
 
   /**
-   * Searches for addresses using nearby or autocomplete query.
+   * Units within a radius of a coordinate (GET /v1/search/nearby). Returns the raw gateway payload.
+   */
+  async nearby(coordinates: Coordinates, options?: NearbyOptions): Promise<unknown> {
+    const { latitude, longitude } = coordinates;
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+      throw AddressError.invalidInput('Valid latitude and longitude are required for nearby search');
+    }
+
+    const res = await this.http.get<{ data: unknown }>('/v1/search/nearby', {
+      params: { lat: latitude, lng: longitude, radius: options?.radius }
+    });
+    return res.data;
+  }
+
+  /**
+   * Searches postcodes via segment-aware autocomplete. Upstream errors propagate.
    */
   async search(query: AddressSearchQuery): Promise<AddressSearchResult[]> {
     if (!query.query?.trim()) {
       return [];
     }
 
-    try {
-      const autocomplete = await this.autocomplete(query.query);
-      const timestamp = new Date().toISOString();
-      return autocomplete.suggestions.map((sugg) => ({
-        id: sugg.code,
-        title: sugg.label,
-        subtitle: `${autocomplete.segment.toUpperCase()}: ${sugg.code}`,
-        address: {
-          raw: `${sugg.label} (${sugg.code})`,
-          administrative: {},
-          postcode: sugg.code,
-          provenance: {
-            raw: { source: 'nipost', retrievedAt: timestamp },
-            postcode: { source: 'nipost', retrievedAt: timestamp }
-          },
-          verification: {
-            status: 'PARTIAL',
-            method: 'nipost_autocomplete',
-            verifiedAt: timestamp
-          }
+    const autocomplete = await this.autocomplete(query.query);
+    const timestamp = new Date().toISOString();
+    return autocomplete.suggestions.map((sugg) => ({
+      id: sugg.code,
+      title: sugg.label,
+      subtitle: `${autocomplete.segment.toUpperCase()}: ${sugg.code}`,
+      address: {
+        raw: `${sugg.label} (${sugg.code})`,
+        administrative: {},
+        postcode: sugg.code,
+        provenance: {
+          raw: { source: 'nipost', retrievedAt: timestamp },
+          postcode: { source: 'nipost', retrievedAt: timestamp }
+        },
+        verification: {
+          status: 'PARTIAL',
+          method: 'nipost_autocomplete',
+          verifiedAt: timestamp
         }
-      }));
-    } catch {
-      return [];
-    }
+      }
+    }));
   }
 
   /**
    * Segment-aware autocomplete for partial postcode query (GET /v1/search/autocomplete).
    */
   async autocomplete(partialPostcode: string): Promise<AutocompleteResult> {
-    const res = await this.http.get<{ data: AutocompleteResult }>(
-      `/v1/search/autocomplete?q=${encodeURIComponent(partialPostcode)}`
-    );
+    const res = await this.http.get<{ data: AutocompleteResult }>('/v1/search/autocomplete', {
+      params: { q: partialPostcode }
+    });
     return res.data;
   }
 
   /**
-   * Assembles 5 segments into formatted postcode (POST /v1/assembly/assemble).
+   * Assembles 5 segments into a canonical postcode (POST /v1/assembly/assemble).
    */
   async assemble(segments: NdapsSegments): Promise<{ postcode: string; display: string; compact: string }> {
-    try {
-      const res = await this.http.post<{
-        data: { postcode: string; display: string; compact: string };
-      }>('/v1/assembly/assemble', segments, { skipAuth: true });
-      return res.data;
-    } catch {
-      // Local fallback
-      return {
-        postcode: formatNdapsPostcode(segments, 'formatted'),
-        display: formatNdapsPostcode(segments, 'display'),
-        compact: formatNdapsPostcode(segments, 'compact')
-      };
-    }
+    const res = await this.http.post<{
+      data: { postcode: string; display: string; compact: string };
+    }>('/v1/assembly/assemble', segments);
+    return res.data;
   }
 
   /**
    * Disassembles a postcode into 5 segments (GET /v1/assembly/disassemble).
    */
   async disassemble(code: string): Promise<NdapsSegments> {
-    try {
-      const res = await this.http.get<{ data: NdapsSegments }>(
-        `/v1/assembly/disassemble?code=${encodeURIComponent(code)}`,
-        { skipAuth: true }
-      );
-      return res.data;
-    } catch {
-      const parsed = parseNdapsPostcode(code);
-      if (!parsed) {
-        throw AddressError.invalidPostcode(code);
-      }
-      return parsed;
-    }
+    const res = await this.http.get<{ data: NdapsSegments }>('/v1/assembly/disassemble', {
+      params: { code }
+    });
+    return res.data;
   }
 
   /**
-   * Offline / hybrid validation of address input.
+   * All states with their 2-letter code (GET /v1/reference/states). Free.
+   */
+  async listStates(): Promise<NamedCode[]> {
+    const res = await this.http.get<{ data: { states: NamedCode[] } }>('/v1/reference/states');
+    return res.data.states;
+  }
+
+  /**
+   * LGAs of a state (GET /v1/reference/lgas). Free.
+   */
+  async listLgas(state: string): Promise<NamedCode[]> {
+    const res = await this.http.get<{ data: { lgas: NamedCode[] } }>('/v1/reference/lgas', {
+      params: { state }
+    });
+    return res.data.lgas;
+  }
+
+  /**
+   * District codes under a state and LGA (GET /v1/reference/districts). Free, code-only.
+   */
+  async listDistricts(state: string, lga: string): Promise<NamedCode[]> {
+    const res = await this.http.get<{ data: { districts: NamedCode[] } }>('/v1/reference/districts', {
+      params: { state, lga }
+    });
+    return res.data.districts;
+  }
+
+  /**
+   * Area codes under a state, LGA and district (GET /v1/reference/areas). Free, code-only.
+   */
+  async listAreas(state: string, lga: string, district: string): Promise<NamedCode[]> {
+    const res = await this.http.get<{ data: { areas: NamedCode[] } }>('/v1/reference/areas', {
+      params: { state, lga, district }
+    });
+    return res.data.areas;
+  }
+
+  /**
+   * Offline validation of address input.
    */
   async validate(address: AddressInput): Promise<AddressValidation> {
     const normalized = normalizeNigerianAddress(address);
