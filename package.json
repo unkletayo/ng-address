@@ -5,14 +5,21 @@
   "type": "module",
   "scripts": {
     "build": "pnpm --recursive --filter \"@ng-address/*\" run build",
+    "docs:dev": "pnpm --filter @ng-address/example-nextjs dev",
+    "docs:build": "pnpm --filter @ng-address/example-nextjs build",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --build"
   },
   "devDependencies": {
+    "happy-dom": "^20.14.5",
     "tsup": "^8.4.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.7",
     "zod": "^3.24.2"
-  }
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ]
 }
